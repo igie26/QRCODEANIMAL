@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator for Animals</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            background-color: #916ba7;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            gap: 1rem;
+            background-color: #d6d6df;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 100%;
+        }
+
+        .user-data {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+
+        .user-data h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .input, .generate-qr-code, .download-qr-code {
+            padding: 0.5rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .input {
+            background-color: #f9f9f9;
+        }
+
+        .generate-qr-code, .download-qr-code {
+            background-color: #1DA1F2;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .generate-qr-code:hover, .download-qr-code:hover {
+            background-color: #0a85d0;
+        }
+
+        .qr-canvas {
+            flex: 0.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f9f9f9;
+            padding: 1rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            min-height: 250px;
+            max-height: 250px;
+        }
+
+        .qr-canvas h2 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .qr-image {
+            display: none;
+            width: 180px;
+            height: 180px;
+            border-radius: 10px;
+        }
+
+        .loading {
+            display: none;
+            border: 5px solid #1DA1F2;
+            border-radius: 50%;
+            border-top: 5px solid transparent;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                max-width: 100%;
+                padding: 1rem;
+            }
+
+            .qr-canvas {
+                min-height: 250px;
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-data">
+            <h2>QR Code Generator for Animals</h2>
+            <input type="text" class="animal-name input" placeholder="Name of Animal">
+            <input type="text" class="animal-species input" placeholder="Species/Breed">
+            <input type="number" class="animal-age input" placeholder="Age">
+            <input type="text" class="animal-color input" placeholder="Color/Appearance">
+            <input type="text" class="animal-size input" placeholder="Size">
+            <input type="text" class="animal-personality input" placeholder="Personality">
+            <input type="text" class="animal-history input" placeholder="History">
+            <input type="text" class="animal-health input" placeholder="Health Status">
+            
+            <!-- Vertebrate Group Dropdown -->
+            <select class="animal-vertebrate input">
+                <option value="">Select Vertebrate Group</option>
+                <option value="Reptiles">Reptiles</option>
+                <option value="Fish">Fish</option>
+                <option value="Birds">Birds</option>
+                <option value="Amphibians">Amphibians</option>
+                <option value="Mammals">Mammals</option>
+            </select>
+
+            <button class="generate-qr-code">Generate QR code</button>
+            <button class="download-qr-code">Download QR code</button>
+        </div>
+        <div class="qr-canvas">
+            <h2>QR Code</h2>
+            <div class="loading"></div>
+            <img src="" alt="" class="qr-image">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const animal_name = document.querySelector('.animal-name');
+            const animal_species = document.querySelector('.animal-species');
+            const animal_age = document.querySelector('.animal-age');
+            const animal_color = document.querySelector('.animal-color');
+            const animal_size = document.querySelector('.animal-size');
+            const animal_personality = document.querySelector('.animal-personality');
+            const animal_history = document.querySelector('.animal-history');
+            const animal_health = document.querySelector('.animal-health');
+            const animal_vertebrate = document.querySelector('.animal-vertebrate');
+
+            const generateCodeButton = document.querySelector('.generate-qr-code');
+            const downloadCodeButton = document.querySelector('.download-qr-code');
+
+            let qrImage = document.querySelector('.qr-image');
+            const loading = document.querySelector('.loading');
+
+            let qrBlob = null;
+
+            generateCodeButton.onclick = async () => {
+                qrImage.src = '';
+                qrBlob = null;
+
+                let name = animal_name.value;
+                let species = animal_species.value;
+                let age = animal_age.value;
+                let color = animal_color.value;
+                let size = animal_size.value;
+                let personality = animal_personality.value;
+                let history = animal_history.value;
+                let health = animal_health.value;
+                let vertebrate = animal_vertebrate.value;
+
+                let vertebrateGroup = vertebrate ? `Vertebrates is a group of ${vertebrate}` : '';
+                
+                let animalData = 
+                    `Name: ${name}\nSpecies/Breed: ${species}\nAge: ${age}\nColor/Appearance: ${color}\nSize: ${size}\nPersonality: ${personality}\nHistory: ${history}\nHealth Status: ${health}\n${vertebrateGroup}`;
+
+                let imgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(animalData)}`;
+
+                loading.style.display = 'block';
+
+                if (name && species && age) {
+                    try {
+                        let response = await fetch(imgSrc);
+                        if (!response.ok) throw new Error('QR generation failed.');
+                        
+                        let data = await response.blob();
+                        qrBlob = data;
+                        qrImage.src = URL.createObjectURL(data);
+                        qrImage.style.display = 'block';
+                        loading.style.display = 'none';
+
+                        // Clear form after generating QR code
+                        animal_name.value = '';
+                        animal_species.value = '';
+                        animal_age.value = '';
+                        animal_color.value = '';
+                        animal_size.value = '';
+                        animal_personality.value = '';
+                        animal_history.value = '';
+                        animal_vertebrate.value = '';
+                        animal_health.value = '';
+
+                    } catch (error) {
+                        console.error('Error generating QR code:', error);
+                        alert('Failed to generate QR code.');
+                        loading.style.display = 'none';
+                    }
+                } else {
+                    alert('Please fill out all required fields!');
+                    loading.style.display = 'none';
+                }
+            };
+
+            downloadCodeButton.onclick = () => {
+                if (qrBlob) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(qrBlob);
+                    link.download = 'Animal_qr_code.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    alert('Please generate the QR code first.');
+                }
+            };
+        });
+    </script>
+</body>
+</html>

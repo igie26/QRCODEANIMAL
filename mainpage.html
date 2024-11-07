@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animal Details QR Code</title>
+    <link rel="stylesheet" href="mainpage.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <img src="https://i.ibb.co/yf8XP9Q/qrima.png"  alt="Animal Details QR Code Logo" class="logo">
+            <!-- Profile Dropdown Menu positioned to the left -->
+            <nav>
+                <!-- Profile Section (displaying user's name after login) -->
+<div class="profile-menu" id="profileMenu">
+    <img src="https://i.ibb.co/bKH45HF/image.png" alt="Profile" class="profile-icon" id="profileIcon">
+    <span id="profileNameDisplay"></span>
+    <div class="dropdown" id="dropdownMenu">
+        <p id="profileName"></p>  <!-- This will be updated dynamically -->
+        <ul>
+            <li><a href="#" id="editProfileLink">Edit Profile</a></li>
+            <h2>Edit Profile</h2>
+            <div id="userDetails"></div>
+            <li><a href="#chat-us">Chat Us</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#logout" id="logoutBtn">Logout</a></li>
+        </ul>
+    </div>
+</div>
+ </div>
+</nav>
+        </div>
+    </header>
+
+    <!-- Main Content Section -->
+    <section id="generate" class="main-section">
+        <div class="container split">
+            <div class="left-side">
+                <h2>Generate QR Code</h2>
+                <p>Generate a QR code for your animals and link it to all its essential details. Just fill in the necessary information and click generate!</p>
+                <button class="qr-btn"><i class="ani-qrcode"></i> Animal Generate QR Code</button>
+                <button class="pet qr-btn"><i class="pet-qrcode"></i> Pet Generate QR Code</button>
+            </div>
+            <div class="right-side">
+                <img src="https://i.ibb.co/Tr611vm/living-with-cats-dogs-689902.jpg" alt="Pets with QR Code" class="qr-image">
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Animal Details QR Code. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript to Toggle Dropdown -->
+    <script>
+        document.getElementById('profileIcon').addEventListener('click', function() {
+            const dropdown = document.getElementById('dropdownMenu');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Hide dropdown if clicking outside
+        document.addEventListener('click', function(event) {
+            const profileMenu = document.getElementById('profileMenu');
+            const dropdown = document.getElementById('dropdownMenu');
+            if (!profileMenu.contains(event.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+        function loadUserData() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+        // Redirect to login if no user is logged in
+        window.location.href = 'login.html';
+        return;
+    }
+    // Function to handle edit profile click
+function goToEditProfile() {
+    const editProfileLink = document.querySelector('editProfileLink');
+    if (editProfileLink) {
+        editProfileLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            // Redirect to the Edit Profile page
+            window.location.href = 'editprofile.html';
+        });
+    }
+}
+function displayUserName() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+        const profileNameDisplay = document.getElementById('profileNameDisplay');
+        profileNameDisplay.innerHTML = `${currentUser.name} ${currentUser.surname}`;
+    }
+}
+
+// Call this function when the page loads
+window.addEventListener('DOMContentLoaded', displayUserName);
+
+// Call the edit profile handler
+window.addEventListener('DOMContentLoaded', goToEditProfile);
+    
+    // Load user data into profile or edit page
+    displayUserProfile(currentUser);
+}
+function displayEditProfile() {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (currentUser) {
+        const userDetailsDiv = document.getElementById('userDetails');
+        userDetailsDiv.innerHTML = `
+            <p><strong>Name:</strong> ${currentUser.name}</p>
+            <p><strong>Surname:</strong> ${currentUser.surname}</p>
+            <p><strong>Username:</strong> ${currentUser.username}</p>
+            <p><strong>Password Key:</strong> ${currentUser.passwordKey}</p>
+        `;
+        
+        // Show the edit profile section
+        document.getElementById('editProfileSection').style.display = 'block';
+    }
+}
+
+// Add click event listener to the "Edit Profile" link
+document.getElementById('editProfileLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    displayEditProfile();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    localStorage.removeItem('currentUser');
+    window.location.href = 'login.html';  // Redirect to login page
+});
+const animalQRButton = document.querySelector('.qr-btn');
+    const petQRButton = document.querySelector('.pet.qr-btn');
+
+    // Add click event listeners
+    animalQRButton.addEventListener('click', function() {
+        window.location.href = 'animalqr.html';
+    });
+
+    petQRButton.addEventListener('click', function() {
+        window.location.href = 'petqr.html';
+    });
+    </script>
+</body>
+</html>
